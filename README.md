@@ -9,19 +9,19 @@ npm install
 npm run dev
 ```
 
-Solo mode works offline. To use online rooms, open **Connection settings** in the game and enter a Supabase project URL and its public `anon` key. The same values can be supplied as `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` before building.
+Solo mode works offline. To use online rooms, open **Connection settings** in the game and enter a Supabase project URL and its public publishable key (or legacy `anon` key). The same values can be supplied as `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` before building.
 
-In Supabase, Realtime must be enabled and **Allow public access** for channels must remain enabled. The room topic is `room-ABCDE`; presence holds player names/IDs, and broadcast carries public game state and guesses. Secrets stay in each player's browser storage and are never broadcast. The public anon key is intended for browser use; never use a `service_role` key here.
+In Supabase, Realtime must be enabled and **Allow public access** for channels must remain enabled. The room topic is `room-ABCDE`; presence holds player names/IDs, and broadcast carries public game state and guesses. Secrets stay in each player's browser storage and are never broadcast. The publishable/anon key is intended for browser use; never use a secret or `service_role` key here.
 
 ## Publish on GitHub Pages
 
 The included GitHub Actions workflow builds and deploys the site on pushes to `main` or `master`.
 
-1. In the repository, add Actions secrets named `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` (optional for a solo-only build).
+1. In **Settings → Secrets and variables → Actions → Variables**, add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` (optional for a solo-only build). These values are public because the publishable key ships in browser code.
 2. In **Settings → Pages**, set the publishing source to **GitHub Actions**.
 3. Push to `main` (or `master`) and check the **Actions** tab. The deployed URL is shown on the Pages deployment.
 
-If the credentials are not added as repository secrets, online users can still paste them into the in-game settings on their device. That setting is saved in that browser only.
+If the values are not added as repository variables, online users can still paste them into the in-game settings on their device. That setting is saved in that browser only.
 
 ## Included modes and features
 
