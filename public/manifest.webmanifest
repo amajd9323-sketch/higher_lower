@@ -1,0 +1,14 @@
+{
+  "name": "Higher / Lower & Code Duel",
+  "short_name": "Code Duel",
+  "description": "A fast, private number and code duel with friends.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0d0c12",
+  "theme_color": "#0d0c12",
+  "icons": [
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
