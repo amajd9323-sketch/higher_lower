@@ -405,6 +405,8 @@ function App() {
     return undefined
   }, [roomState?.status, roomState?.roundWinner, selfId, playSound])
 
+  const remaining = roomState?.turnEndsAt ? Math.max(0, Math.ceil((roomState.turnEndsAt - now) / 1000)) : TURN_SECONDS
+
   useEffect(() => {
     if (roomState?.status !== 'playing' || !roomState.turnEndsAt || roomState.turnId !== selfId || remaining > 5 || remaining <= 0) return
     const cue = `${roomState.turnEndsAt}-${remaining}`
@@ -426,7 +428,6 @@ function App() {
   const opponent = roomState?.players?.find((player) => player.id !== selfId)
   const opponentOnline = peers.some((peer) => peer.id === opponent?.id)
   const myTurn = roomState?.turnId === selfId
-  const remaining = roomState?.turnEndsAt ? Math.max(0, Math.ceil((roomState.turnEndsAt - now) / 1000)) : TURN_SECONDS
   const maxAttempts = roomState ? getMaxAttempts(roomState) : 0
   const myAttempts = roomState?.attempts?.[selfId] || 0
   const ownRange = roomState?.ranges?.[selfId] || [1, 100]
