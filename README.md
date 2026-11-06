@@ -1,6 +1,6 @@
 # Higher / Lower & Code Duel
 
-A mobile-first, bilingual (Arabic RTL / English LTR) number duel built with React, Tailwind CSS, Lucide, and Supabase Realtime. Rooms use one Realtime channel with Presence and Broadcast only. The app does not create database tables or require player accounts.
+A mobile-first, bilingual (Arabic RTL / English LTR) number duel built by Ibrahim and Hema with React, Tailwind CSS, Lucide, and Supabase Realtime. Rooms use one Realtime channel with Presence and Broadcast only. The app does not create database tables or require player accounts.
 
 ## Play locally
 
