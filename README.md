@@ -9,6 +9,12 @@ npm install
 npm run dev
 ```
 
+## Install on a phone
+
+- On Android or desktop, open the game and use **Install** in the page or the browser menu.
+- On iPhone or iPad, open the game in Safari, tap **Share**, then choose **Add to Home Screen**.
+- After the first online visit, the app shell and solo mode are available offline. Online rooms still need an internet connection.
+
 Solo mode works offline. To use online rooms, open **Connection settings** in the game and enter a Supabase project URL and its public publishable key (or legacy `anon` key). The same values can be supplied as `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` before building.
 
 In Supabase, Realtime must be enabled and **Allow public access** for channels must remain enabled. The room topic is `room-ABCDE`; presence holds player names/IDs, and broadcast carries public game state and guesses. Secrets stay in each player's browser storage and are never broadcast. The publishable/anon key is intended for browser use; never use a secret or `service_role` key here.

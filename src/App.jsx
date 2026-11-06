@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Award, Check, ChevronDown, ChevronUp, CircleHelp,
   Copy, Crown, Eye, Gamepad2, Globe2, Hash, Link2, LoaderCircle, LockKeyhole, Moon, Music2,
-  Plus, RefreshCw, Send, Settings2, Share2, ShieldCheck, Sparkles, Sun, Trophy, Volume2,
+  Download, Ellipsis, Plus, RefreshCw, Send, Settings2, Share2, ShieldCheck, Sparkles, Sun, Trophy, Volume2,
   VolumeX, Wifi, WifiOff, X, Zap,
 } from 'lucide-react'
 import { getMaxAttempts, getFeedback, makeRoomCode, makeRoomState, MODES, REACTIONS, resetRound, TURN_SECONDS } from './lib/game.js'
@@ -17,7 +17,7 @@ const COPY = {
     yourTurn: 'دورك الآن', opponentTurn: 'دور الخصم', turnIn: 'الوقت المتبقي', enterGuess: 'اكتب تخمينك', makeGuess: 'تخمين', attemptsLeft: 'المحاولات المتبقية', turnMissed: 'انتهى الوقت — احتُسبت محاولة فائتة.', hintHigher: 'أعلى ▲', hintLower: 'أدنى ▼', correct: 'إجابة صحيحة!', codeHint: 'الأرقام الصحيحة في مواقعها فقط تظهر؛ النجوم تخفي البقية.', rangeBar: 'نطاقك المتبقي', history: 'سجل التخمينات', noGuesses: 'لا توجد تخمينات بعد. ابدأ أنت!', timeout: 'انتهى الوقت',
     score: 'نتيجة المباراة', series: 'السلسلة', round: 'الجولة', roundWon: 'فزت بالجولة!', roundLost: 'فاز خصمك بالجولة', matchWon: 'بطل المواجهة!', matchLost: 'خصمك حسم المواجهة', nextRound: 'الجولة التالية', rematch: 'مواجهة جديدة', waitingRematch: 'اختار اللاعبان المواجهة الجديدة', shareResult: 'شارك النتيجة', copyLink: 'انسخ رابط الدعوة', copied: 'تم النسخ', backHome: 'العودة للرئيسية', totalWins: 'انتصارات السلسلة',
     reactions: 'تفاعلات مباشرة', reactionSent: 'أرسل تفاعلًا', sound: 'الأصوات', mute: 'كتم الصوت', unmute: 'تشغيل الصوت', light: 'الوضع الفاتح', dark: 'الوضع الداكن', arabic: 'العربية', english: 'English', settings: 'إعداد الاتصال', settingsTitle: 'اتصال Supabase Realtime', settingsBody: 'يلزم مشروع Supabase مجاني لتشغيل الغرف أونلاين. استخدم رابط المشروع ومفتاح Publishable العام (أو anon القديم)؛ لا حاجة لجداول أو حسابات.', supabaseUrl: 'رابط مشروع Supabase', supabaseKey: 'مفتاح Publishable العام (أو anon)', save: 'حفظ الإعدادات', cancel: 'إلغاء', setupNeeded: 'أضف إعدادات Supabase للاتصال بغرف الأونلاين.',
-    configSaved: 'تم حفظ إعداد الاتصال على هذا الجهاز.', errorCode: 'أدخل رمزًا من ٥ أحرف أو أرقام.', errorName: 'اكتب اسمًا مستعارًا أولًا.', errorSecret: 'تحقق من الرقم أو الكود ثم حاول مجددًا.', roomFull: 'الغرفة مكتملة؛ دخلت كمشاهد.', shareText: 'انضم إليّ في مبارزة Higher / Lower & Code Duel!', shareSuccess: 'رابط الغرفة جاهز للمشاركة.', soloLabel: 'تحدي الكمبيوتر', bot: 'الكمبيوتر', botThinking: 'الكمبيوتر يفكر…', botGuess: 'تخمين الكمبيوتر', startSolo: 'ابدأ التدريب', restart: 'ابدأ من جديد', soloWin: 'أحسنت! اكتشفت الرقم.', botWin: 'الكمبيوتر عرف رقمك!', soloDraw: 'انتهت المحاولات', soundOn: 'الصوت مفعّل', powered: 'لا تسجيل. لا جداول. أسرار خاصة.', connectionTip: 'تحتاج إعداد Supabase مرة واحدة لتعمل الغرف من أي جهاز.', codeMade: 'تم إنشاء رمز جديد', invite: 'أرسل لصديقك هذا الرمز', joinAnother: 'دخول مشاهد', copiedCode: 'نُسخ الرمز',
+    configSaved: 'تم حفظ إعداد الاتصال على هذا الجهاز.', errorCode: 'أدخل رمزًا من ٥ أحرف أو أرقام.', errorName: 'اكتب اسمًا مستعارًا أولًا.', errorSecret: 'تحقق من الرقم أو الكود ثم حاول مجددًا.', roomFull: 'الغرفة مكتملة؛ دخلت كمشاهد.', shareText: 'انضم إليّ في مبارزة Higher / Lower & Code Duel!', shareSuccess: 'رابط الغرفة جاهز للمشاركة.', soloLabel: 'تحدي الكمبيوتر', bot: 'الكمبيوتر', botThinking: 'الكمبيوتر يفكر…', botGuess: 'تخمين الكمبيوتر', startSolo: 'ابدأ التدريب', restart: 'ابدأ من جديد', soloWin: 'أحسنت! اكتشفت الرقم.', botWin: 'الكمبيوتر عرف رقمك!', soloDraw: 'انتهت المحاولات', soundOn: 'الصوت مفعّل', powered: 'لا تسجيل. لا جداول. أسرار خاصة.', connectionTip: 'شارك رمز الغرفة مع صديقك؛ لا يحتاج أي منكما إلى حساب.', codeMade: 'تم إنشاء رمز جديد', invite: 'أرسل لصديقك هذا الرمز', joinAnother: 'دخول مشاهد', copiedCode: 'نُسخ الرمز', clear: 'مسح', delete: 'حذف', installApp: 'ثبّت اللعبة على هاتفك', installNow: 'ثبّت الآن', installed: 'تم تثبيت اللعبة', installIos: 'للتثبيت: افتح «مشاركة» في المتصفح، ثم اختر «إضافة إلى الشاشة الرئيسية».', installBrowser: 'افتح قائمة المتصفح واختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية».', offlinePlay: 'أنت دون اتصال. يمكنك لعب التدريب الفردي الآن.', installPitch: 'أضفها للشاشة الرئيسية وافتحها كتطبيق سريع.', more: 'المزيد',
   },
   en: {
     tagline: 'Number duels. Nerves of steel.', subtitle: 'Pick a secret, then crack your opponent’s before they crack yours.', online: 'Play online', solo: 'Challenge the bot', practice: 'Quick practice, no wait and no connection.', onlineHint: 'Private room, two players, live score.', yourName: 'Your player name', namePlaceholder: 'Enter a nickname', roomCode: 'Room code', codePlaceholder: 'Example: A7K2Q', create: 'Create a room', join: 'Join room', createHint: 'Make a room and share the code', joinHint: 'Have a code? Enter it here', connecting: 'Connecting…', connected: 'Connected', reconnecting: 'Reconnecting…', offline: 'Connection lost', waiting: 'Waiting for a player', waitingHelp: 'Send this code to a friend to start the duel.',
@@ -26,7 +26,7 @@ const COPY = {
     yourTurn: 'Your turn', opponentTurn: 'Opponent’s turn', turnIn: 'Time left', enterGuess: 'Enter your guess', makeGuess: 'Guess', attemptsLeft: 'Attempts left', turnMissed: 'Time ran out — a missed attempt was counted.', hintHigher: 'Higher ▲', hintLower: 'Lower ▼', correct: 'Correct!', codeHint: 'Only digits in the correct positions are shown; stars mask the rest.', rangeBar: 'Your remaining range', history: 'Guess history', noGuesses: 'No guesses yet. Make the first one!', timeout: 'Time up',
     score: 'Match score', series: 'Series', round: 'Round', roundWon: 'Round won!', roundLost: 'Your opponent won the round', matchWon: 'Duel champion!', matchLost: 'Your opponent took the match', nextRound: 'Next round', rematch: 'New match', waitingRematch: 'Both players chose a rematch', shareResult: 'Share result', copyLink: 'Copy invite link', copied: 'Copied', backHome: 'Back home', totalWins: 'Series wins',
     reactions: 'Live reactions', reactionSent: 'Sent a reaction', sound: 'Sound effects', mute: 'Mute sound', unmute: 'Enable sound', light: 'Light mode', dark: 'Dark mode', arabic: 'العربية', english: 'English', settings: 'Connection settings', settingsTitle: 'Supabase Realtime connection', settingsBody: 'A free Supabase project is needed for online rooms. Use the project URL and public publishable key (or legacy anon key); no tables or accounts are needed.', supabaseUrl: 'Supabase project URL', supabaseKey: 'Public publishable key (or anon)', save: 'Save settings', cancel: 'Cancel', setupNeeded: 'Add your Supabase settings to connect to online rooms.',
-    configSaved: 'Connection settings saved on this device.', errorCode: 'Enter a 5-character room code.', errorName: 'Enter a nickname first.', errorSecret: 'Check your number or code and try again.', roomFull: 'The room is full; you joined as a spectator.', shareText: 'Join my Higher / Lower & Code Duel!', shareSuccess: 'Your room link is ready to share.', soloLabel: 'Bot challenge', bot: 'Computer', botThinking: 'The computer is thinking…', botGuess: 'Computer guess', startSolo: 'Start practice', restart: 'Start over', soloWin: 'Nice! You found the number.', botWin: 'The computer found your number!', soloDraw: 'No attempts left', soundOn: 'Sound is on', powered: 'No sign-up. No tables. Private secrets.', connectionTip: 'Set up Supabase once to enable rooms on any device.', codeMade: 'New room code created', invite: 'Send this code to your friend', joinAnother: 'Join as spectator', copiedCode: 'Code copied',
+    configSaved: 'Connection settings saved on this device.', errorCode: 'Enter a 5-character room code.', errorName: 'Enter a nickname first.', errorSecret: 'Check your number or code and try again.', roomFull: 'The room is full; you joined as a spectator.', shareText: 'Join my Higher / Lower & Code Duel!', shareSuccess: 'Your room link is ready to share.', soloLabel: 'Bot challenge', bot: 'Computer', botThinking: 'The computer is thinking…', botGuess: 'Computer guess', startSolo: 'Start practice', restart: 'Start over', soloWin: 'Nice! You found the number.', botWin: 'The computer found your number!', soloDraw: 'No attempts left', soundOn: 'Sound is on', powered: 'No sign-up. No tables. Private secrets.', connectionTip: 'Share the room code; neither player needs an account.', codeMade: 'New room code created', invite: 'Send this code to your friend', joinAnother: 'Join as spectator', copiedCode: 'Code copied', clear: 'Clear', delete: 'Delete', installApp: 'Install the game', installNow: 'Install', installed: 'Game installed', installIos: 'To install, tap Share in your browser, then choose Add to Home Screen.', installBrowser: 'Open your browser menu and choose Install app or Add to Home Screen.', offlinePlay: 'You are offline. Solo practice is ready to play.', installPitch: 'Add it to your home screen and open it like an app.', more: 'More',
   },
 }
 
@@ -74,6 +74,10 @@ function App() {
   const [lang, setLang] = useState(() => localStorage.getItem('hld-lang') || 'ar')
   const [theme, setTheme] = useState(() => localStorage.getItem('hld-theme') || 'dark')
   const [sound, setSound] = useState(() => localStorage.getItem('hld-sound') !== 'off')
+  const [installPrompt, setInstallPrompt] = useState(null)
+  const [appInstalled, setAppInstalled] = useState(() => window.matchMedia?.('(display-mode: standalone)').matches || window.navigator.standalone === true)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [isOnline, setIsOnline] = useState(() => navigator.onLine)
   const [name, setName] = useState(() => localStorage.getItem('hld-name') || '')
   const [joinInput, setJoinInput] = useState(() => new URLSearchParams(location.search).get('room') || '')
   const [activeRoom, setActiveRoom] = useState('')
@@ -115,6 +119,28 @@ function App() {
   useEffect(() => { localStorage.setItem('hld-sound', sound ? 'on' : 'off') }, [sound])
   useEffect(() => { if (name.trim()) localStorage.setItem('hld-name', name.trim()) }, [name])
   useEffect(() => { const timer = setInterval(() => setNow(Date.now()), 250); return () => clearInterval(timer) }, [])
+  useEffect(() => {
+    const captureInstall = (event) => { event.preventDefault(); setInstallPrompt(event) }
+    const installed = () => { setAppInstalled(true); setInstallPrompt(null); setToast(t('installed')) }
+    const online = () => setIsOnline(true)
+    const offline = () => setIsOnline(false)
+    window.addEventListener('beforeinstallprompt', captureInstall)
+    window.addEventListener('appinstalled', installed)
+    window.addEventListener('online', online)
+    window.addEventListener('offline', offline)
+    return () => {
+      window.removeEventListener('beforeinstallprompt', captureInstall)
+      window.removeEventListener('appinstalled', installed)
+      window.removeEventListener('online', online)
+      window.removeEventListener('offline', offline)
+    }
+  }, [t])
+  useEffect(() => {
+    if (!mobileMenuOpen) return undefined
+    const closeMenu = (event) => { if (!event.target.closest('[data-mobile-menu]')) setMobileMenuOpen(false) }
+    document.addEventListener('pointerdown', closeMenu)
+    return () => document.removeEventListener('pointerdown', closeMenu)
+  }, [mobileMenuOpen])
   useEffect(() => { sharedRef.current = roomState }, [roomState])
   useEffect(() => { peersRef.current = peers }, [peers])
   useEffect(() => {
@@ -576,55 +602,81 @@ function App() {
     }, 650)
   }
 
-  const iconButton = (title, Icon, onClick, extra = '') => <button type="button" title={title} aria-label={title} onClick={() => { playSound(); onClick() }} className={`control grid h-10 w-10 place-items-center rounded-xl ${extra}`}><Icon size={17} /></button>
+  const iconButton = (title, Icon, onClick, extra = '') => <button type="button" title={title} aria-label={title} onClick={() => { playSound(); onClick() }} className={`control grid h-11 w-11 shrink-0 place-items-center rounded-xl ${extra}`}><Icon size={18} /></button>
+
+  async function installApp() {
+    setMobileMenuOpen(false)
+    if (installPrompt) {
+      await installPrompt.prompt()
+      const choice = await installPrompt.userChoice
+      if (choice?.outcome === 'accepted') setAppInstalled(true)
+      setInstallPrompt(null)
+      return
+    }
+    const isAppleMobile = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+    setToast(t(isAppleMobile ? 'installIos' : 'installBrowser'))
+  }
 
   return (
     <main className={`app-shell ${theme === 'light' ? 'light' : ''} min-h-screen`}>
       <div className="grid-glow pointer-events-none fixed inset-x-0 top-0 h-[520px] opacity-75" />
       {confetti && Array.from({ length: 44 }, (_, index) => <i key={index} className="confetti-piece" style={{ left: `${(index * 41 + 6) % 100}%`, background: ['#c9f27a', '#8c6dff', '#ffbd70', '#f88bad'][index % 4], animationDelay: `${(index % 9) * .14}s`, animationDuration: `${2.2 + (index % 7) * .23}s` }} />)}
-      <header className="relative z-10 mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-7 sm:py-6">
-        <button type="button" onClick={leaveRoom} className="flex items-center gap-3 text-start" aria-label={t('backHome')}>
+      <header className="relative z-30 mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-3 py-3 sm:px-7 sm:py-6">
+        <button type="button" onClick={leaveRoom} className="flex shrink-0 items-center gap-2 text-start" aria-label={t('backHome')}>
           <span className="grid h-10 w-10 place-items-center rounded-[14px] bg-lime text-ink shadow-[0_6px_20px_rgba(201,242,122,.18)]"><Zap size={21} fill="currentColor" /></span>
-          <span><span className="block text-[14px] font-extrabold tracking-tight">HIGHER <b className="text-violet">/</b> LOWER</span><span className="block text-[10px] font-bold tracking-[.23em] text-lime">CODE DUEL</span></span>
+          <span className="hidden sm:block"><span className="block text-[14px] font-extrabold tracking-tight">HIGHER <b className="text-violet">/</b> LOWER</span><span className="block text-[10px] font-bold tracking-[.23em] text-lime">CODE DUEL</span></span>
         </button>
-        <div className="flex items-center gap-2">
+        <div className="hidden min-w-0 items-center gap-2 sm:flex">
           <span className="hidden rounded-full border border-white/10 px-3 py-1.5 text-[11px] font-medium text-zinc-400 sm:block">{t('powered')}</span>
           {iconButton(lang === 'ar' ? 'English' : 'العربية', Globe2, () => setLang((current) => current === 'ar' ? 'en' : 'ar'))}
           {iconButton(theme === 'dark' ? t('light') : t('dark'), theme === 'dark' ? Sun : Moon, () => setTheme((current) => current === 'dark' ? 'light' : 'dark'))}
           {iconButton(sound ? t('mute') : t('unmute'), sound ? Volume2 : VolumeX, () => setSound((current) => !current))}
+          {!appInstalled && iconButton(t('installApp'), Download, installApp)}
           {iconButton(t('settings'), Settings2, () => { setConfigDraft(getSupabaseConfig()); setSettingsOpen(true) })}
+        </div>
+        <div className="relative flex shrink-0 items-center gap-2 sm:hidden" data-mobile-menu>
+          {iconButton(lang === 'ar' ? 'English' : 'العربية', Globe2, () => setLang((current) => current === 'ar' ? 'en' : 'ar'))}
+          <button type="button" aria-label={t('more')} aria-haspopup="menu" aria-expanded={mobileMenuOpen} onClick={() => setMobileMenuOpen((open) => !open)} className="control grid h-11 w-11 place-items-center rounded-xl"><Ellipsis size={20} /></button>
+          {mobileMenuOpen && <div role="menu" className="surface absolute end-0 top-[calc(100%+.5rem)] z-50 w-60 rounded-2xl p-2 shadow-2xl">
+            <button role="menuitem" type="button" onClick={() => { setTheme((current) => current === 'dark' ? 'light' : 'dark'); setMobileMenuOpen(false) }} className="flex min-h-12 w-full items-center gap-3 rounded-xl px-3 text-start text-sm font-semibold"><Sun size={17} className="text-lime" />{theme === 'dark' ? t('light') : t('dark')}</button>
+            <button role="menuitem" type="button" onClick={() => { setSound((current) => !current); setMobileMenuOpen(false) }} className="flex min-h-12 w-full items-center gap-3 rounded-xl px-3 text-start text-sm font-semibold"><Volume2 size={17} className="text-lime" />{sound ? t('mute') : t('unmute')}</button>
+            {!appInstalled && <button role="menuitem" type="button" onClick={installApp} className="flex min-h-12 w-full items-center gap-3 rounded-xl px-3 text-start text-sm font-semibold"><Download size={17} className="text-lime" />{t('installApp')}</button>}
+            <button role="menuitem" type="button" onClick={() => { setConfigDraft(getSupabaseConfig()); setSettingsOpen(true); setMobileMenuOpen(false) }} className="flex min-h-12 w-full items-center gap-3 rounded-xl px-3 text-start text-sm font-semibold"><Settings2 size={17} className="text-lime" />{t('settings')}</button>
+          </div>}
         </div>
       </header>
 
-      {!activeRoom && !solo && <section className="relative z-10 mx-auto max-w-6xl px-4 pb-16 pt-7 sm:px-7 sm:pt-14">
+      {!isOnline && <div role="status" className="relative z-10 mx-3 mb-2 rounded-xl border border-amber-300/20 bg-amber-300/[.07] px-3 py-2 text-center text-xs text-amber-100 sm:mx-auto sm:max-w-6xl">{t('offlinePlay')}</div>}
+
+      {!activeRoom && !solo && <section className="relative z-10 mx-auto max-w-6xl px-3 pb-28 pt-5 sm:px-7 sm:pb-16 sm:pt-14">
         <div className="mx-auto max-w-3xl text-center">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-violet-400/20 bg-violet-400/[.08] px-3.5 py-2 text-[11px] font-semibold text-violet-200"><Sparkles size={13} className="text-lime" /> {t('tagline')}</div>
-          <h1 className="text-balance text-[clamp(2.3rem,8vw,5.5rem)] font-black leading-[.99] tracking-[-.055em]">{lang === 'ar' ? <>خمن. تحدَّ.<br /><span className="gradient-word">احسم المواجهة.</span></> : <>Guess. Challenge.<br /><span className="gradient-word">Claim the win.</span></>}</h1>
-          <p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-zinc-400 sm:text-base">{t('subtitle')}</p>
-          <div className="mt-5 inline-flex items-center gap-2 text-[11px] font-medium text-zinc-500"><ShieldCheck size={14} className="text-lime" />{t('powered')}</div>
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-violet-400/20 bg-violet-400/[.08] px-3 py-2 text-[11px] font-semibold text-violet-200 sm:mb-6 sm:px-3.5"><Sparkles size={13} className="text-lime" /> {t('tagline')}</div>
+          <h1 className="text-balance text-[clamp(2rem,9.5vw,3.25rem)] font-black leading-[1.08] tracking-[-.045em] sm:text-[clamp(2.3rem,8vw,5.5rem)] sm:leading-[.99] sm:tracking-[-.055em]">{lang === 'ar' ? <>خمن. تحدَّ.<br /><span className="gradient-word">احسم المواجهة.</span></> : <>Guess. Challenge.<br /><span className="gradient-word">Claim the win.</span></>}</h1>
+          <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-zinc-400 sm:mt-5 sm:text-base sm:leading-7">{t('subtitle')}</p>
+          <div className="mt-3 hidden items-center justify-center gap-2 text-[11px] font-medium text-zinc-500 sm:inline-flex sm:mt-5"><ShieldCheck size={14} className="text-lime" />{t('powered')}</div>
         </div>
 
-        <div className="mx-auto mt-11 grid max-w-4xl gap-4 md:grid-cols-[1fr_1fr]">
-          <article className="surface relative overflow-hidden rounded-[26px] p-5 sm:p-7">
+        <div className="mx-auto mt-6 grid max-w-4xl gap-3 md:mt-11 md:grid-cols-[1fr_1fr] md:gap-4">
+          <article className="surface relative overflow-hidden rounded-[24px] p-4 sm:rounded-[26px] sm:p-7">
             <div className="absolute -end-12 -top-12 h-40 w-40 rounded-full bg-violet-500/10 blur-3xl" />
             <div className="relative flex items-start justify-between gap-3"><div><span className="mb-3 grid h-11 w-11 place-items-center rounded-2xl violet"><Wifi size={20} /></span><h2 className="text-xl font-bold">{t('online')}</h2><p className="mt-1 text-xs muted">{t('onlineHint')}</p></div><span className="rounded-full border border-lime/15 bg-lime/[.07] px-2.5 py-1 text-[10px] font-semibold text-lime">{t('bestOf')}</span></div>
-            <div className="relative mt-6 space-y-3">
-              <label className="block text-[11px] font-semibold muted">{t('yourName')}</label>
-              <input value={name} maxLength={20} onChange={(event) => setName(event.target.value)} placeholder={t('namePlaceholder')} className="control h-12 w-full rounded-xl px-4 text-sm outline-none placeholder:text-zinc-600" />
+            <div className="relative mt-5 space-y-3 sm:mt-6">
+              <label htmlFor="player-name" className="block text-xs font-semibold muted">{t('yourName')}</label>
+              <input id="player-name" autoComplete="nickname" value={name} maxLength={20} onChange={(event) => setName(event.target.value)} placeholder={t('namePlaceholder')} className="control h-14 w-full rounded-xl px-4 text-base outline-none placeholder:text-zinc-600" />
               <div className="grid grid-cols-1 gap-3 pt-1 sm:grid-cols-2">
-                <button type="button" onClick={() => startRoom(makeRoomCode())} className="primary flex h-[50px] items-center justify-center gap-2 rounded-xl px-3 text-sm font-bold"><Plus size={17} />{t('create')}</button>
-                <div className="flex h-[50px] gap-2">
-                  <input value={joinInput} onChange={(event) => setJoinInput(event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 5))} maxLength={5} placeholder={t('codePlaceholder')} className="control min-w-0 flex-1 rounded-xl px-3 text-center font-mono text-sm font-bold tracking-[.18em] outline-none placeholder:font-sans placeholder:tracking-normal" />
-                  <button type="button" onClick={() => startRoom(joinInput)} className="control rounded-xl px-4 text-sm font-bold"><Link2 size={17} /></button>
+                <button type="button" onClick={() => startRoom(makeRoomCode())} className="primary flex h-14 items-center justify-center gap-2 rounded-xl px-3 text-sm font-bold"><Plus size={18} />{t('create')}</button>
+                <div className="flex h-14 gap-2">
+                  <input dir="ltr" aria-label={t('roomCode')} autoCapitalize="characters" autoComplete="off" value={joinInput} onChange={(event) => setJoinInput(event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 5))} maxLength={5} placeholder={t('codePlaceholder')} className="control min-w-0 flex-1 rounded-xl px-3 text-center font-mono text-base font-bold tracking-[.18em] outline-none placeholder:font-sans placeholder:text-sm placeholder:tracking-normal" />
+                  <button type="button" onClick={() => startRoom(joinInput)} aria-label={t('join')} className="control grid w-14 shrink-0 place-items-center rounded-xl text-sm font-bold"><Link2 size={18} /></button>
                 </div>
               </div>
-              <div className="flex justify-between text-[10px] muted"><span>{t('createHint')}</span><span>{t('joinHint')}</span></div>
+              <div className="grid gap-1 text-[10px] leading-4 muted sm:grid-cols-2 sm:gap-3"><span>{t('createHint')}</span><span>{t('joinHint')}</span></div>
               {roomError && !activeRoom && <p className="rounded-xl border border-rose-400/20 bg-rose-400/[.07] px-3 py-2 text-xs text-rose-300">{roomError}</p>}
             </div>
             <div className="relative mt-5 flex items-start gap-2 border-t pt-4 text-[10px] leading-5 soft-border muted"><LockKeyhole size={13} className="mt-0.5 shrink-0 text-lime" />{t('connectionTip')}</div>
           </article>
 
-          <article className="surface flex flex-col rounded-[26px] p-5 sm:p-7">
+          <article className="surface flex flex-col rounded-[24px] p-4 sm:rounded-[26px] sm:p-7">
             <div className="flex items-start justify-between"><div><span className="mb-3 grid h-11 w-11 place-items-center rounded-2xl bg-lime/[.09] text-lime"><Gamepad2 size={20} /></span><h2 className="text-xl font-bold">{t('solo')}</h2><p className="mt-1 text-xs muted">{t('practice')}</p></div><span className="rounded-full border border-white/10 px-2.5 py-1 text-[10px] font-semibold muted">OFFLINE</span></div>
             <div className="mt-7 grid grid-cols-2 gap-2">
               {['classic', 'code'].map((mode) => <button key={mode} type="button" onClick={() => setSoloMode(mode)} className={`rounded-xl border p-3 text-start transition ${soloMode === mode ? 'border-lime/40 bg-lime/[.08]' : 'control'}`}><span className={`text-sm font-bold ${soloMode === mode ? 'text-lime' : ''}`}>{t(mode)}</span><span className="mt-1 block text-[10px] leading-4 muted">{t(mode === 'classic' ? 'classicSub' : 'codeSub')}</span></button>)}
@@ -634,7 +686,9 @@ function App() {
           </article>
         </div>
 
-        <div className="mx-auto mt-6 grid max-w-4xl grid-cols-3 gap-3 text-center">
+          {!appInstalled && <div className="surface mx-auto mt-4 flex max-w-4xl items-center justify-between gap-3 rounded-2xl p-3 sm:mt-5 sm:p-4"><div className="flex min-w-0 items-center gap-3"><span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-violet/[.12] text-violet-200"><Download size={18} /></span><div className="min-w-0"><div className="text-xs font-bold">{t('installApp')}</div><p className="mt-1 text-[10px] leading-4 muted">{t('installPitch')}</p></div></div><button type="button" onClick={installApp} className="primary min-h-11 shrink-0 rounded-xl px-4 text-xs font-bold">{t('installNow')}</button></div>}
+
+          <div className="mx-auto mt-4 grid max-w-4xl grid-cols-3 gap-2 text-center sm:mt-6 sm:gap-3">
           {[[LockKeyhole, t('powered')], [Trophy, t('bestOf')], [Music2, t('soundOn')]].map(([Icon, label], index) => <div key={index} className="rounded-2xl border px-3 py-3 soft-border bg-white/[.018]"><Icon size={15} className="mx-auto mb-1.5 text-lime" /><span className="text-[10px] font-medium muted">{label}</span></div>)}
         </div>
       </section>}
@@ -647,8 +701,8 @@ function App() {
 
       {settingsOpen && <SettingsModal t={t} configDraft={configDraft} setConfigDraft={setConfigDraft} onClose={() => setSettingsOpen(false)} onSave={saveSettings} message={configMessage} />}
 
-      {toast && <div role="status" className="fixed bottom-5 left-1/2 z-[70] -translate-x-1/2 rounded-2xl border border-white/10 bg-[#211e2b] px-4 py-3 text-xs font-semibold shadow-2xl float-in">{toast}</div>}
-      <footer className="relative z-10 mx-auto flex max-w-6xl items-center justify-between px-5 pb-6 pt-2 text-[10px] muted sm:px-7"><span>© {new Date().getFullYear()} · HIGHER / LOWER</span><span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-lime pulse-dot" />Realtime duel</span></footer>
+      {toast && <div role="status" className="toast-safe-bottom fixed left-1/2 z-[70] max-w-[calc(100vw-2rem)] -translate-x-1/2 rounded-2xl border border-white/10 bg-[#211e2b] px-4 py-3 text-xs font-semibold shadow-2xl float-in">{toast}</div>}
+      <footer className="safe-bottom relative z-10 mx-auto flex max-w-6xl items-center justify-between px-5 pb-6 pt-2 text-[10px] muted sm:px-7"><span>© {new Date().getFullYear()} · HIGHER / LOWER</span><span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-lime pulse-dot" />Realtime duel</span></footer>
     </main>
   )
 }
@@ -666,14 +720,14 @@ function RoomView({ t, lang, rtl, activeRoom, roomStatus, roomError, roomState, 
   const matchDone = roomState?.status === 'match-result'
   const fmtGuess = (guess) => roomState?.mode === 'code' ? String(guess ?? '----').padStart(4, '0') : String(guess ?? '—')
 
-  return <section className="relative z-10 mx-auto max-w-6xl px-4 pb-10 pt-3 sm:px-7 sm:pt-5">
+  return <section className="relative z-10 mx-auto max-w-6xl px-3 pb-28 pt-2 sm:px-7 sm:pb-10 sm:pt-5">
     <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
       <div className="flex items-center gap-3">
-        <button type="button" onClick={leaveRoom} className="control grid h-10 w-10 place-items-center rounded-xl" title={t('backHome')}><ArrowLeft size={17} className={rtl ? 'rotate-180' : ''} /></button>
+        <button type="button" onClick={leaveRoom} className="control grid h-11 w-11 shrink-0 place-items-center rounded-xl" title={t('backHome')} aria-label={t('backHome')}><ArrowLeft size={17} className={rtl ? 'rotate-180' : ''} /></button>
         <div><div className="flex items-center gap-2"><h1 className="text-lg font-black">{t('lobby')}</h1><span className="rounded-full border border-white/10 bg-white/[.035] px-2 py-1 font-mono text-[10px] font-bold tracking-[.16em] text-lime">{activeRoom}</span></div><div className="mt-1 flex items-center gap-1.5 text-[10px] muted"><span className={`h-1.5 w-1.5 rounded-full ${roomStatus === 'connected' ? 'bg-lime' : roomStatus === 'connecting' ? 'animate-pulse bg-amber-300' : 'bg-rose-400'}`} />{roomStatus === 'connected' ? t('connected') : roomStatus === 'connecting' ? t('connecting') : t('offline')}</div></div>
       </div>
       <div className="flex items-center gap-2">
-        <button type="button" onClick={copyRoomLink} className="control flex h-10 items-center gap-2 rounded-xl px-3 text-xs font-semibold"><Copy size={15} />{t('copyLink')}</button>
+        <button type="button" onClick={copyRoomLink} aria-label={t('copyLink')} className="control flex min-h-11 items-center justify-center gap-2 rounded-xl px-3 text-[11px] font-semibold"><Copy size={15} /><span className="hidden sm:inline">{t('copyLink')}</span></button>
         <span className="hidden rounded-xl border px-3 py-2 text-[10px] font-semibold muted soft-border sm:flex sm:items-center sm:gap-2"><Eye size={14} />{t('spectators')}: {Math.max(0, peers.filter((peer) => peer.role === 'spectator').length)}</span>
       </div>
     </div>
@@ -700,7 +754,7 @@ function RoomView({ t, lang, rtl, activeRoom, roomStatus, roomError, roomState, 
             {roomState.roundNo === 1 && roomState.scores?.[selfId] === 0 && <div className="mb-4 grid grid-cols-2 gap-2">
               {['classic','code'].map((mode) => <button key={mode} disabled={isSpectator || roomState.ready?.[selfId] || roomState.ready?.[opponentProfile?.id]} type="button" onClick={() => updateSettings(mode)} className={`rounded-2xl border p-3 text-start transition ${roomState.mode === mode ? 'border-violet/60 bg-violet/[.12]' : 'control'}`}><div className="flex items-center justify-between"><span className={`text-sm font-bold ${roomState.mode === mode ? 'text-violet-100' : ''}`}>{t(mode)}</span>{roomState.mode === mode && <Check size={15} className="text-lime" />}</div><p className="mt-1 text-[10px] leading-4 muted">{t(mode === 'classic' ? 'classicSub' : 'codeSub')}</p></button>)}
             </div>}
-            {roomState.mode === 'classic' && <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border p-3 soft-border bg-white/[.02]"><span className="text-xs font-semibold">{t('difficulty')}</span><div className="flex gap-1.5">{['easy','normal','hard'].map((level) => <button key={level} type="button" disabled={isSpectator || roomState.ready?.[selfId] || roomState.ready?.[opponentProfile?.id]} onClick={() => updateSettings('classic', level)} className={`rounded-lg px-3 py-1.5 text-[10px] font-bold transition ${roomState.difficulty === level ? 'bg-violet/25 text-violet-100' : 'control muted'}`}>{t(level)}</button>)}</div><span className="w-full text-[10px] muted">{t('range')}: {classicSettings?.min}–{classicSettings?.max} · {maxAttempts || MODES.classic[roomState.difficulty].attempts} {t('guesses')}</span></div>}
+            {roomState.mode === 'classic' && <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border p-3 soft-border bg-white/[.02]"><span className="text-xs font-semibold">{t('difficulty')}</span><div className="flex gap-1.5">{['easy','normal','hard'].map((level) => <button key={level} type="button" disabled={isSpectator || roomState.ready?.[selfId] || roomState.ready?.[opponentProfile?.id]} onClick={() => updateSettings('classic', level)} className={`rounded-lg px-3 py-1.5 text-[10px] font-bold transition ${roomState.difficulty === level ? 'bg-violet/25 text-violet-100' : 'control muted'}`}>{t(level)}</button>)}</div><span className="w-full text-[10px] muted">{t('range')}: <b dir="ltr" className="font-normal">{classicSettings?.min}–{classicSettings?.max}</b> · {maxAttempts || MODES.classic[roomState.difficulty].attempts} {t('guesses')}</span></div>}
             {roomState.mode === 'code' && <div className="mb-4 rounded-xl border border-violet/15 bg-violet/[.06] px-3 py-2 text-[10px] leading-5 muted">{t('codeHint')}</div>}
             {isSpectator && <div className="mb-4 rounded-xl border border-amber-300/15 bg-amber-300/[.06] p-3 text-xs text-amber-100"><Eye className="me-2 inline" size={14} />{t('roomFull')}</div>}
             {names.length < 2 && <div className="my-5 rounded-2xl border border-dashed px-4 py-6 text-center soft-border"><div className="mx-auto grid h-11 w-11 place-items-center rounded-2xl bg-white/[.04] text-violet-200"><LoaderCircle className="animate-spin" size={20} /></div><p className="mt-3 text-sm font-bold">{t('waiting')}</p><p className="mt-1 text-xs muted">{t('waitingHelp')}</p></div>}
@@ -715,7 +769,7 @@ function RoomView({ t, lang, rtl, activeRoom, roomStatus, roomError, roomState, 
                   {isSelf && !ready && <form onSubmit={submitSecret} className="mt-4">
                     <label className="mb-2 block text-xs font-bold">{t(roomState.mode === 'code' ? 'chooseSecretCode' : 'chooseSecret')}</label>
                     <p className="mb-3 text-[10px] leading-4 muted">{t(roomState.mode === 'code' ? 'secretCodeHint' : 'secretHint')}</p>
-                    <div className="flex gap-2"><input inputMode="numeric" autoComplete="off" value={secretDraft} onChange={(event) => setSecretDraft(event.target.value.replace(/\D/g, '').slice(0, roomState.mode === 'code' ? 4 : 4))} maxLength={roomState.mode === 'code' ? 4 : 4} placeholder={t(roomState.mode === 'code' ? 'codeSecretPlaceholder' : 'secretPlaceholder')} className="control h-11 min-w-0 flex-1 rounded-xl px-3 text-center font-mono text-lg font-bold tracking-[.2em] outline-none" /><button type="submit" className="primary rounded-xl px-4 text-xs font-bold">{t('ready')}</button></div>
+                    <div className="flex gap-2"><input dir="ltr" inputMode="numeric" enterKeyHint="done" pattern="[0-9]*" autoComplete="off" value={secretDraft} onChange={(event) => setSecretDraft(event.target.value.replace(/\D/g, '').slice(0, 4))} maxLength={4} placeholder={t(roomState.mode === 'code' ? 'codeSecretPlaceholder' : 'secretPlaceholder')} className="control h-14 min-w-0 flex-1 rounded-xl px-3 text-center font-mono text-lg font-bold tracking-[.2em] outline-none" /><button type="submit" className="primary min-h-14 rounded-xl px-4 text-xs font-bold">{t('ready')}</button></div>
                   </form>}
                   {isSelf && ready && <div className="mt-4 flex items-center gap-2 rounded-xl border border-lime/15 bg-lime/[.05] px-3 py-2 text-xs font-semibold text-lime"><Check size={15} />{t('readyWaiting')}{mySecret && <span className="ms-auto tracking-[.2em]">{roomState.mode === 'code' ? '••••' : '•••'}</span>}</div>}
                   {!isSelf && <div className="mt-4 flex items-center gap-2 rounded-xl border px-3 py-2 text-xs soft-border"><span className={`h-1.5 w-1.5 rounded-full ${roomState.ready?.[player.id] ? 'bg-lime' : 'bg-zinc-600'}`} />{roomState.ready?.[player.id] ? t('ready') : opponentOnline ? t('waitingForOpponent') : t('opponentLeft')}</div>}
@@ -735,8 +789,9 @@ function RoomView({ t, lang, rtl, activeRoom, roomStatus, roomError, roomState, 
             {roomState.pending && <div className="mb-4 rounded-xl border border-violet/20 bg-violet/[.08] py-4 text-center"><div className="text-xs font-semibold muted">{roomState.pending.guesserId === selfId ? t('opponentTurn') : t('botThinking')}</div><div className="mt-1 font-mono text-2xl font-black tracking-[.2em] text-violet-100">{fmtGuess(roomState.pending.guess)}</div></div>}
             {myTurn && !roomState.pending && !isSpectator && <form onSubmit={submitGuess} className="mt-5">
               <label className="mb-2 block text-xs font-bold">{t('enterGuess')}</label>
-              <div className="flex gap-2"><input inputMode="numeric" autoComplete="off" value={guessDraft} onChange={(event) => setGuessDraft(event.target.value.replace(/\D/g, '').slice(0, roomState.mode === 'code' ? 4 : String(classicSettings.max).length))} maxLength={roomState.mode === 'code' ? 4 : String(classicSettings.max).length} placeholder={roomState.mode === 'code' ? '0000' : `${classicSettings.min} – ${classicSettings.max}`} className="control h-12 min-w-0 flex-1 rounded-xl px-4 text-center font-mono text-xl font-bold tracking-[.2em] outline-none" /><button type="submit" disabled={!guessDraft || (roomState.mode === 'code' && guessDraft.length !== 4)} className="primary flex h-12 items-center gap-2 rounded-xl px-5 text-sm font-bold"><Send size={15} />{t('makeGuess')}</button></div>
-              <NumericKeypad guessDraft={guessDraft} setGuessDraft={setGuessDraft} maxLength={roomState.mode === 'code' ? 4 : String(classicSettings.max).length} pressDigit={pressDigit} />
+              <input dir="ltr" inputMode="numeric" enterKeyHint="done" pattern="[0-9]*" autoComplete="off" value={guessDraft} onChange={(event) => setGuessDraft(event.target.value.replace(/\D/g, '').slice(0, roomState.mode === 'code' ? 4 : String(classicSettings.max).length))} maxLength={roomState.mode === 'code' ? 4 : String(classicSettings.max).length} placeholder={roomState.mode === 'code' ? '0000' : `${classicSettings.min} – ${classicSettings.max}`} className="control h-14 w-full rounded-xl px-4 text-center font-mono text-2xl font-bold tracking-[.2em] outline-none" />
+              <NumericKeypad t={t} setGuessDraft={setGuessDraft} pressDigit={pressDigit} />
+              <button type="submit" disabled={!guessDraft || (roomState.mode === 'code' && guessDraft.length !== 4)} className="primary mt-3 flex h-14 w-full items-center justify-center gap-2 rounded-xl text-sm font-bold"><Send size={17} />{t('makeGuess')}</button>
             </form>}
             {isSpectator && <div className="mt-5 flex items-center justify-center gap-2 rounded-xl border p-3 text-xs muted soft-border"><Eye size={14} />{t('spectator')}</div>}
             <ReactionBar t={t} chooseReaction={chooseReaction} />
@@ -784,11 +839,11 @@ function RangeBar({ t, range, settings, rangePercentage }) {
   const [low, high] = range
   const left = rangePercentage(low)
   const right = rangePercentage(high)
-  return <div className="rounded-2xl border p-3 soft-border bg-white/[.02]"><div className="mb-2 flex items-center justify-between text-[10px] font-semibold muted"><span>{t('rangeBar')}</span><span className="font-mono font-bold text-lime">{low} – {high}</span></div><div className="range-track"><span className="range-fill" style={{ left: `${left}%`, width: `${Math.max(1, right - left)}%` }} /></div><div className="mt-2 flex justify-between font-mono text-[9px] muted"><span>{settings.min}</span><span>{settings.max}</span></div></div>
+  return <div className="rounded-2xl border p-3 soft-border bg-white/[.02]"><div className="mb-2 flex items-center justify-between text-[10px] font-semibold muted"><span>{t('rangeBar')}</span><span dir="ltr" className="font-mono font-bold text-lime">{low} – {high}</span></div><div className="range-track"><span className="range-fill" style={{ left: `${left}%`, width: `${Math.max(1, right - left)}%` }} /></div><div className="mt-2 flex justify-between font-mono text-[9px] muted"><span dir="ltr">{settings.min}</span><span dir="ltr">{settings.max}</span></div></div>
 }
 
-function NumericKeypad({ guessDraft, setGuessDraft, maxLength, pressDigit }) {
-  return <div className="mt-3 grid grid-cols-5 gap-1.5 sm:gap-2" aria-label="Numeric keypad">{[1,2,3,4,5,6,7,8,9,'clear',0,'back'].map((key, index) => <button key={`${key}-${index}`} type="button" onClick={() => key === 'clear' ? setGuessDraft('') : key === 'back' ? setGuessDraft((value) => value.slice(0,-1)) : pressDigit(String(key))} className={`key control ${key === 'clear' || key === 'back' ? 'text-[10px] muted' : ''}`}>{key === 'clear' ? 'CLR' : key === 'back' ? '⌫' : key}</button>)}</div>
+function NumericKeypad({ t, setGuessDraft, pressDigit }) {
+  return <div role="group" dir="ltr" aria-label={t('enterGuess')} className="mx-auto mt-3 grid w-full max-w-sm grid-cols-3 gap-2">{[1,2,3,4,5,6,7,8,9,'clear',0,'back'].map((key, index) => <button key={`${key}-${index}`} type="button" aria-label={key === 'clear' ? t('clear') : key === 'back' ? t('delete') : String(key)} onClick={() => key === 'clear' ? setGuessDraft('') : key === 'back' ? setGuessDraft((value) => value.slice(0,-1)) : pressDigit(String(key))} className={`key control min-h-[58px] text-base ${key === 'clear' || key === 'back' ? 'text-sm muted' : ''}`}>{key === 'clear' ? t('clear') : key === 'back' ? '⌫' : key}</button>)}</div>
 }
 
 function FeedbackBadge({ t, feedback, correct }) {
@@ -800,7 +855,7 @@ function FeedbackBadge({ t, feedback, correct }) {
 }
 
 function ReactionBar({ t, chooseReaction }) {
-  return <div className="mt-5 flex items-center justify-between border-t pt-3 soft-border"><span className="flex items-center gap-1.5 text-[9px] muted"><Sparkles size={12} />{t('reactions')}</span><div className="flex gap-1">{REACTIONS.map((emoji) => <button key={emoji} type="button" onClick={() => chooseReaction(emoji)} className="grid h-9 w-9 place-items-center rounded-xl transition hover:bg-white/[.08] hover:scale-110 active:scale-95" aria-label={`${t('reactionSent')} ${emoji}`}>{emoji}</button>)}</div></div>
+  return <div className="mt-5 flex flex-col items-start gap-2 border-t pt-3 soft-border sm:flex-row sm:items-center sm:justify-between"><span className="flex items-center gap-1.5 text-[9px] muted"><Sparkles size={12} />{t('reactions')}</span><div className="flex w-full justify-between gap-1 sm:w-auto sm:justify-start">{REACTIONS.map((emoji) => <button key={emoji} type="button" onClick={() => chooseReaction(emoji)} className="grid h-11 w-11 place-items-center rounded-xl transition hover:bg-white/[.08] hover:scale-110 active:scale-95" aria-label={`${t('reactionSent')} ${emoji}`}>{emoji}</button>)}</div></div>
 }
 
 function FloatingReactions({ reactions }) {
@@ -821,17 +876,17 @@ function SoloView({ t, lang, rtl, solo, soloTurn, setSoloTurn, botDraft, setBotD
   const maxLength = solo.mode === 'code' ? 4 : String(solo.high).length
   const playerRange = solo.range || [solo.low, solo.high]
   const fmt = (guess) => solo.mode === 'code' ? String(guess || '----').padStart(4, '0') : String(guess || '—')
-  return <section className="relative z-10 mx-auto max-w-5xl px-4 pb-10 pt-3 sm:px-7 sm:pt-5">
-    <div className="mb-4 flex items-center justify-between"><div className="flex items-center gap-3"><button type="button" onClick={() => { setSolo(null); setSoloTurn('you'); setSecretDraft('') }} className="control grid h-10 w-10 place-items-center rounded-xl"><ArrowLeft size={17} className={rtl ? 'rotate-180' : ''} /></button><div><h1 className="text-lg font-black">{t('soloLabel')}</h1><p className="mt-1 text-[10px] muted">{t(solo.mode)} · {t(solo.difficulty)}</p></div></div><span className="rounded-xl border border-lime/15 bg-lime/[.06] px-3 py-2 text-[10px] font-bold text-lime">{solo.mode === 'classic' ? `${solo.low}–${solo.high}` : '0000–9999'}</span></div>
+  return <section className="relative z-10 mx-auto max-w-5xl px-3 pb-28 pt-2 sm:px-7 sm:pb-10 sm:pt-5">
+    <div className="mb-4 flex items-center justify-between"><div className="flex items-center gap-3"><button type="button" onClick={() => { setSolo(null); setSoloTurn('you'); setSecretDraft('') }} aria-label={t('backHome')} className="control grid h-11 w-11 place-items-center rounded-xl"><ArrowLeft size={17} className={rtl ? 'rotate-180' : ''} /></button><div><h1 className="text-lg font-black">{t('soloLabel')}</h1><p className="mt-1 text-[10px] muted">{t(solo.mode)} · {t(solo.difficulty)}</p></div></div><span dir="ltr" className="rounded-xl border border-lime/15 bg-lime/[.06] px-3 py-2 text-[10px] font-bold text-lime">{solo.mode === 'classic' ? `${solo.low}–${solo.high}` : '0000–9999'}</span></div>
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_300px]">
       <div className="space-y-4">
-        {!solo.playerSecret && <div className="surface mx-auto max-w-xl rounded-[24px] p-5 sm:p-7"><div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-lime/[.1] text-lime"><LockKeyhole size={23} /></div><h2 className="mt-4 text-center text-xl font-bold">{t(solo.mode === 'code' ? 'chooseSecretCode' : 'chooseSecret')}</h2><p className="mt-2 text-center text-xs leading-5 muted">{t(solo.mode === 'code' ? 'secretCodeHint' : 'secretHint')}</p><form onSubmit={soloSubmitSecret} className="mx-auto mt-5 max-w-sm"><input inputMode="numeric" value={secretDraft} onChange={(event) => setSecretDraft(event.target.value.replace(/\D/g, '').slice(0, maxLength))} maxLength={maxLength} placeholder={t(solo.mode === 'code' ? 'codeSecretPlaceholder' : 'secretPlaceholder')} className="control h-14 w-full rounded-xl text-center font-mono text-2xl font-bold tracking-[.22em] outline-none" /><button className="primary mt-3 h-12 w-full rounded-xl text-sm font-bold">{t('ready')}</button></form></div>}
+        {!solo.playerSecret && <div className="surface mx-auto max-w-xl rounded-[24px] p-4 sm:p-7"><div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-lime/[.1] text-lime"><LockKeyhole size={23} /></div><h2 className="mt-4 text-center text-xl font-bold">{t(solo.mode === 'code' ? 'chooseSecretCode' : 'chooseSecret')}</h2><p className="mt-2 text-center text-xs leading-5 muted">{t(solo.mode === 'code' ? 'secretCodeHint' : 'secretHint')}</p><form onSubmit={soloSubmitSecret} className="mx-auto mt-5 max-w-sm"><input dir="ltr" inputMode="numeric" enterKeyHint="done" pattern="[0-9]*" value={secretDraft} onChange={(event) => setSecretDraft(event.target.value.replace(/\D/g, '').slice(0, maxLength))} maxLength={maxLength} placeholder={t(solo.mode === 'code' ? 'codeSecretPlaceholder' : 'secretPlaceholder')} className="control h-14 w-full rounded-xl text-center font-mono text-2xl font-bold tracking-[.22em] outline-none" /><button className="primary mt-3 h-14 w-full rounded-xl text-sm font-bold">{t('ready')}</button></form></div>}
 
         {solo.playerSecret && !solo.finished && <div className="surface rounded-[24px] p-4 sm:p-6">
           <div className="mb-5 grid grid-cols-[1fr_auto_1fr] items-center gap-2"><div className={`flex items-center gap-2 rounded-2xl border p-3 ${soloTurn === 'you' ? 'border-lime/25 bg-lime/[.04]' : 'soft-border'}`}><Avatar name={t('you')} highlighted={soloTurn === 'you'} /><span className="text-xs font-bold">{t('you')}</span></div><span className="text-[9px] font-bold tracking-[.18em] text-zinc-600">VS</span><div className={`flex items-center justify-end gap-2 rounded-2xl border p-3 ${soloTurn === 'bot' ? 'border-violet/30 bg-violet/[.06]' : 'soft-border'}`}><span className="text-xs font-bold">{t('bot')}</span><Avatar name={t('bot')} /></div></div>
           <div className="mb-4 flex items-center justify-between rounded-2xl border p-3 soft-border"><div><div className="text-[9px] font-semibold muted">{soloTurn === 'you' ? t('yourTurn') : t('botThinking')}</div><div className="mt-1 text-xs font-bold">{soloTurn === 'you' ? t('attemptsLeft') : t('botGuess')}</div></div><span className="font-mono text-lg font-black text-lime">{soloTurn === 'you' ? Math.max(0, solo.maxAttempts - solo.attempts) : Math.max(0, solo.maxAttempts - solo.botAttempts)}</span></div>
           {solo.mode === 'classic' && <RangeBar t={t} range={playerRange} settings={{ min: solo.low, max: solo.high }} rangePercentage={(value) => Math.max(0, Math.min(100, ((value - solo.low) / (solo.high - solo.low)) * 100))} />}
-          {soloTurn === 'you' && <form onSubmit={soloGuess} className="mt-5"><label className="mb-2 block text-xs font-bold">{t('enterGuess')}</label><div className="flex gap-2"><input inputMode="numeric" value={guessDraft} onChange={(event) => setGuessDraft(event.target.value.replace(/\D/g, '').slice(0, maxLength))} maxLength={maxLength} placeholder={solo.mode === 'code' ? '0000' : `${solo.low} – ${solo.high}`} className="control h-12 min-w-0 flex-1 rounded-xl px-4 text-center font-mono text-xl font-bold tracking-[.2em] outline-none" /><button disabled={!guessDraft || (solo.mode === 'code' && guessDraft.length !== 4)} className="primary flex h-12 items-center gap-2 rounded-xl px-5 text-sm font-bold"><Send size={15} />{t('makeGuess')}</button></div><NumericKeypad guessDraft={guessDraft} setGuessDraft={setGuessDraft} maxLength={maxLength} pressDigit={pressDigit} /></form>}
+          {soloTurn === 'you' && <form onSubmit={soloGuess} className="mt-5"><label className="mb-2 block text-xs font-bold">{t('enterGuess')}</label><input dir="ltr" inputMode="numeric" enterKeyHint="done" pattern="[0-9]*" value={guessDraft} onChange={(event) => setGuessDraft(event.target.value.replace(/\D/g, '').slice(0, maxLength))} maxLength={maxLength} placeholder={solo.mode === 'code' ? '0000' : `${solo.low} – ${solo.high}`} className="control h-14 w-full rounded-xl px-4 text-center font-mono text-2xl font-bold tracking-[.2em] outline-none" /><NumericKeypad t={t} setGuessDraft={setGuessDraft} pressDigit={pressDigit} /><button disabled={!guessDraft || (solo.mode === 'code' && guessDraft.length !== 4)} className="primary mt-3 flex h-14 w-full items-center justify-center gap-2 rounded-xl text-sm font-bold"><Send size={17} />{t('makeGuess')}</button></form>}
           {soloTurn === 'bot' && <div className="mt-5 rounded-2xl border border-violet/20 bg-violet/[.055] px-4 py-5 text-center"><span className="mx-auto grid h-11 w-11 place-items-center rounded-xl bg-violet/15 text-violet-100"><LoaderCircle className="animate-spin" size={19} /></span><p className="mt-3 text-xs font-bold">{t('botThinking')}</p></div>}
           {solo.playerFeedback && <div className="mt-3 flex justify-center"><FeedbackBadge t={t} feedback={solo.playerFeedback} correct={solo.playerFeedback === 'correct'} /></div>}
         </div>}
